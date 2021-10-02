@@ -1,29 +1,65 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import './App.css'
-import Data from './Data'
-import SingleQuestion from './Question'
 
 
-
+const url =  'https://course-api.com/react-tabs-project'
 const App = () => {
-  const [questions,setQuestions] = useState(Data)
+  const [loading,setLoading] = useState(true)
+  const [jobs,setJobs] = useState([])
+  const [value,setValue] = useState(0)
+
+  const fetchJobs = async () =>{
+    const reponse = await fetch(url)
+    const newJobs = await reponse.json()
+    setJobs(newJobs)
+    setLoading(false)
+  }
+
+  useEffect(()=>{
+    fetchJobs()
+  },[])
+
+  if(loading) {
+    return (
+      <section className="section loading">
+        <h1>Loading...</h1>
+      </section>
+    )
+  }
+
+  const {company,dates,duties,title} = jobs[value]
   return (
-    <main>
-    <div classname="container">
-   <h3>Questions and answers about login</h3>
-   <section className="info">
-     {
-       questions.map((question) => {
-         return (
-         <SingleQuestion key={question.id} {...question}></SingleQuestion>
-         )
-       })
-
-     }
-
-   </section>
+    <div className="section">
+  <div className="title">
+    <h2>experience</h2>
+    <div className="underline"></div>
     </div>
-    </main>
+    <div className="jobs-center">
+      <div className="btn-container">
+        {jobs.map((item,index)=>{
+          return (
+            <button key={item.id}
+            onClick={()=> setValue(index)}
+    className={`job-btn ${index === value && 'active-btn'}`}>{item.company}</button>        
+          )
+        })}
+      </div>
+      <artical className="job-info">
+        <h3>{title}</h3>
+        <h4>{company}</h4>
+        <p className="job-date">{dates}</p>
+        {duties.map((duty,index)=>{
+          return (
+     <div key={index} className="job-desc">
+       <p>{duty}</p> 
+       </div>      
+          )
+        })}
+      </artical>
+      </div>
+      <button type="button" className="btn">
+        more info</button>      
+    </div>
   )
 }
 
